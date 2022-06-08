@@ -167,4 +167,5 @@ int gconfig_init(BOOL use_mapper, int argc, char **argv) {
   }
   // TODO: implement config_cmd_line_parse
   gconfig_initialized = TRUE;
+  return 1;
 }
