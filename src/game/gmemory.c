@@ -1,5 +1,5 @@
-#include "gmemory.h"
-#include "mem.h"
+#include "game/gmemory.h"
+#include "game/mem.h"
 
 int gmemory_init() {
   assoc_register_mem(mem_malloc, mem_realloc, mem_free);
