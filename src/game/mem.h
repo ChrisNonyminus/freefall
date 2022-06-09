@@ -1,5 +1,5 @@
-#ifndef MEM_H
-#define MEM_H
+#ifndef GAME_MEM_H
+#define GAME_MEM_H
 
 int mem_malloc(size_t size);
 int mem_realloc(void *ptr, size_t size);

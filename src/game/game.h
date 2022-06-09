@@ -1,5 +1,5 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef GAME_GAME_H
+#define GAME_GAME_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -7,6 +7,7 @@
 
 #include "common/boolean.h"
 
+extern *base_install_location;
 extern void *main_selfrun_list;
 extern int main_selfrun_count;
 extern int main_selfrun_index;

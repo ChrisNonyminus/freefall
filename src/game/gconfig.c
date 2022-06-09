@@ -3,95 +3,105 @@
 #include "minGlue-stdio.h"
 #include "minIni.h"
 
+#include "game/game.h"
 #include "game/gconfig.h"
 #include "game/mem.h"
 
-gconfig *game_config;
+gconfig game_config;
 BOOL gconfig_initialized;
 char *gconfig_file_name;
 
-int config_init(gconfig *config) {
+BOOL config_init(gconfig *config) {
   if (!config || assoc_init(config, 10, sizeof(gconfig), 0)) {
-    return 0;
+    return FALSE;
   }
-  return 1;
+  return TRUE;
 }
 
-void config_set_string(gconfig *config, char *section, char *key, char *value) {
+BOOL config_set_string(gconfig *config, char *section, char *key, char *value) {
   if (!section || !key || !value) {
-    return;
+    return FALSE;
   }
   if (!gconfig_initialized && ini_haskey(section, key, gconfig_file_name)) {
-    return;
+    return FALSE;
   }
-  ini_puts(section, key, value, gconfig_file_name);
+  return ini_puts(section, key, value, gconfig_file_name);
 }
 
-void config_set_value(gconfig *config, char *section, char *key, long value) {
+BOOL config_set_value(gconfig *config, char *section, char *key, long value) {
   if (!section || !key) {
-    return;
+    return FALSE;
   }
   if (!gconfig_initialized && ini_haskey(section, key, gconfig_file_name)) {
-    return;
+    return FALSE;
   }
-  ini_putl(section, key, value, gconfig_file_name);
+  return ini_putl(section, key, value, gconfig_file_name);
 }
 
-void config_set_double(gconfig *config, char *section, char *key, float value) {
+BOOL config_set_double(gconfig *config, char *section, char *key, float value) {
   if (!section || !key) {
-    return;
+    return FALSE;
   }
   if (!gconfig_initialized && ini_haskey(section, key, gconfig_file_name)) {
-    return;
+    return FALSE;
   }
-  ini_putf(section, key, value, gconfig_file_name);
+  return ini_putf(section, key, value, gconfig_file_name);
 }
 
-void config_set_bool(gconfig *config, char *section, char *key, BOOL value) {
+BOOL config_set_bool(gconfig *config, char *section, char *key, BOOL value) {
   if (!section || !key) {
-    return;
+    return FALSE;
   }
   if (!gconfig_initialized && ini_haskey(section, key, gconfig_file_name)) {
-    return;
+    return FALSE;
   }
-  ini_putl(section, key, value, gconfig_file_name);
+  return ini_putl(section, key, value, gconfig_file_name);
 }
 
-void config_get_string(gconfig *config, char *section, char *key, char *value) {
+BOOL config_get_string(gconfig *config, char *section, char *key,
+                       char **value) {
   if (!section || !key || !value) {
-    return;
+    return FALSE;
   }
-  ini_gets(section, key, "", value, 1024, gconfig_file_name);
+  char *tmp;
+  ini_gets(section, key, "", tmp, 1024, gconfig_file_name);
+  *value = tmp;
+  return TRUE;
 }
 
-void config_get_value(gconfig *config, char *section, char *key, long *value) {
+BOOL config_get_value(gconfig *config, char *section, char *key, long *value) {
   if (!section || !key || !value) {
-    return;
+    return FALSE;
   }
   *value = ini_getl(section, key, 0, gconfig_file_name);
+  return TRUE;
 }
 
-void config_get_double(gconfig *config, char *section, char *key,
+BOOL config_get_double(gconfig *config, char *section, char *key,
                        float *value) {
   if (!section || !key || !value) {
-    return;
+    return FALSE;
   }
   *value = ini_getf(section, key, 0.0, gconfig_file_name);
+  return TRUE;
 }
 
-void config_get_bool(gconfig *config, char *section, char *key, BOOL *value) {
+BOOL config_get_bool(gconfig *config, char *section, char *key, BOOL *value) {
   if (!section || !key || !value) {
-    return;
+    return FALSE;
   }
   *value = ini_getl(section, key, FALSE, gconfig_file_name);
+  return TRUE;
 }
 
 int gconfig_init(BOOL use_mapper, int argc, char **argv) {
-  gconfig *config = game_config;
+  gconfig *config = &game_config;
   if (gconfig_initialized || config_init(config) != -1) {
     return 0;
   }
-  gconfig_file_name = "fallout2.cfg";
+  char config_file_name[256];
+  sprintf(config_file_name, "%sfallout2.cfg", base_install_location);
+  gconfig_file_name = config_file_name;
 
   config_set_string(config, "system", "executable", "game");
   config_set_string(config, "system", "master_dat", "master.dat");
@@ -168,4 +178,12 @@ int gconfig_init(BOOL use_mapper, int argc, char **argv) {
   // TODO: implement config_cmd_line_parse
   gconfig_initialized = TRUE;
   return 1;
+}
+
+BOOL gconfig_exit(BOOL save_config) {
+  if (!gconfig_initialized) {
+    return FALSE;
+  }
+  gconfig_initialized = FALSE;
+  return TRUE;
 }
